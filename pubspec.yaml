@@ -37,6 +37,7 @@ dependencies:
   dio: ^4.0.6
   provider: ^6.0.3
   audioplayers: ^0.20.1
+  flutter_slidable: 0.6.0
 
 dev_dependencies:
   flutter_test:

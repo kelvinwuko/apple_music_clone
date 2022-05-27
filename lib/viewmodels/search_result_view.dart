@@ -58,10 +58,6 @@ class SearchAlbumResultViewModel {
     return _searchResult.artistName;
   }
 
-  String get artworkUrl60 {
-    return _searchResult.artworkUrl60;
-  }
-
   String get artworkUrl100 {
     return _searchResult.artworkUrl100;
   }

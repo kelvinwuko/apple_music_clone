@@ -1,6 +1,8 @@
 import 'package:apple_music_clone/assets/app_style.dart';
 import 'package:apple_music_clone/viewmodels/search_result_list_view_model.dart';
+import 'package:apple_music_clone/viewmodels/search_result_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:audioplayers/audioplayers.dart';
 
@@ -15,6 +17,7 @@ class _SearchScreenState extends State<SearchScreen> {
   TextEditingController inputTextController = TextEditingController();
   AudioPlayer audioPlayer = AudioPlayer();
   String searchType = 'song';
+  List<SearchAlbumResultViewModel> bookmarkList = [];
 
   @override
   void initState() {
@@ -66,6 +69,9 @@ class _SearchScreenState extends State<SearchScreen> {
                     Provider.of<SearchResultListViewModel>(context,
                             listen: false)
                         .getSearchResult(phrasedString);
+                    Provider.of<SearchResultListViewModel>(context,
+                            listen: false)
+                        .getSearchAlbumResult(phrasedString);
                   } else {
                     showDialog(
                       context: context,
@@ -144,6 +150,30 @@ class _SearchScreenState extends State<SearchScreen> {
                     style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
                   ),
                 ),
+                const SizedBox(
+                  width: 10,
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary:
+                        (searchType == 'bookmark') ? Colors.pink : Colors.black,
+                    onPrimary: Colors.white,
+                    shadowColor: Colors.transparent,
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(32.0)),
+                    minimumSize: const Size(60, 30),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      searchType = 'bookmark';
+                    });
+                  },
+                  child: const Text(
+                    'Bookmarks',
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700),
+                  ),
+                ),
               ],
             ),
             const Divider(
@@ -152,11 +182,29 @@ class _SearchScreenState extends State<SearchScreen> {
             Expanded(
                 child: (searchType == 'song')
                     ? _searchResultList()
-                    : _searchAlbumResultList()),
+                    : (searchType == 'album')
+                        ? _searchAlbumResultList()
+                        : _bookmarkList()),
           ],
         ),
       ),
     );
+  }
+
+  addBookmark(SearchAlbumResultViewModel album) {
+    if (!bookmarkList.contains(album)) {
+      bookmarkList.add(album);
+      const snackBar = SnackBar(
+        content: Text('Added to Bookmark'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    } else {
+      const snackBar = SnackBar(
+        backgroundColor: Colors.red,
+        content: Text('Already in Bookmark'),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 
   Widget _searchResultList() {
@@ -179,9 +227,7 @@ class _SearchScreenState extends State<SearchScreen> {
                       style: smallText,
                     ),
                     subtitle: Text(
-                        listViewModel.songs[index].kind +
-                            " - " +
-                            listViewModel.songs[index].artistName,
+                        "${listViewModel.songs[index].kind} - ${listViewModel.songs[index].artistName}",
                         style: smallSubtitleText),
                     leading: ClipRRect(
                       borderRadius: BorderRadius.circular(3),
@@ -190,7 +236,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           fit: BoxFit.cover),
                     ),
                     trailing: const Icon(
-                      Icons.keyboard_arrow_right,
+                      Icons.play_arrow_rounded,
                       color: Colors.grey,
                     ),
                     onTap: () async {
@@ -225,22 +271,78 @@ class _SearchScreenState extends State<SearchScreen> {
             itemBuilder: (context, index) {
               return Column(
                 children: [
+                  Slidable(
+                    actionPane: const SlidableDrawerActionPane(),
+                    secondaryActions: [
+                      IconSlideAction(
+                        color: Colors.pink,
+                        caption: "Bookmark",
+                        icon: Icons.bookmark,
+                        onTap: () {
+                          addBookmark(listViewModel.albums[index]);
+                        },
+                      )
+                    ],
+                    child: ListTile(
+                      visualDensity:
+                          const VisualDensity(horizontal: 0, vertical: -2),
+                      title: Text(
+                        listViewModel.albums[index].collectionName,
+                        style: smallText,
+                      ),
+                      subtitle: Text(
+                          "${listViewModel.albums[index].year.year} - ${listViewModel.albums[index].artistName}",
+                          style: smallSubtitleText),
+                      leading: ClipRRect(
+                        borderRadius: BorderRadius.circular(3),
+                        child: Image.network(
+                            listViewModel.albums[index].artworkUrl100,
+                            fit: BoxFit.cover),
+                      ),
+                      trailing: const Icon(
+                        Icons.keyboard_arrow_right,
+                        color: Colors.grey,
+                      ),
+                      onTap: () async {},
+                    ),
+                  ),
+                  const Divider(
+                    color: Colors.grey,
+                  ),
+                ],
+              );
+            }),
+      );
+    } else {
+      return Container();
+    }
+  }
+
+  Widget _bookmarkList() {
+    //var listViewModel = Provider.of<SearchResultListViewModel>(context);
+    if (bookmarkList.isNotEmpty) {
+      return MediaQuery.removePadding(
+        removeTop: true,
+        removeBottom: true,
+        context: context,
+        child: ListView.builder(
+            itemCount: bookmarkList.length,
+            itemBuilder: (context, index) {
+              return Column(
+                children: [
                   ListTile(
                     visualDensity:
                         const VisualDensity(horizontal: 0, vertical: -2),
                     title: Text(
-                      listViewModel.albums[index].collectionName,
+                      bookmarkList[index].collectionName,
                       style: smallText,
                     ),
                     subtitle: Text(
-                        listViewModel.albums[index].year.year.toString() +
-                            " - " +
-                            listViewModel.albums[index].artistName,
+                        "${bookmarkList[index].year.year} - ${bookmarkList[index].artistName}",
                         style: smallSubtitleText),
                     leading: ClipRRect(
                       borderRadius: BorderRadius.circular(3),
-                      child: Image.network(
-                          listViewModel.songs[index].artworkUrl100,
+                      child: Image.network(bookmarkList[index].artworkUrl100,
                           fit: BoxFit.cover),
                     ),
                     trailing: const Icon(

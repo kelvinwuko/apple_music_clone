@@ -35,42 +35,48 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      bottomNavigationBar: ClipRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: 100.0,
-            sigmaY: 100.0,
-          ),
-          child: Opacity(
-            opacity: 0.5,
-            child: BottomNavigationBar(
-              currentIndex: _currentIndex,
-              items: const <BottomNavigationBarItem>[
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.library_music),
-                  label: 'Library',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.graphic_eq),
-                  label: 'Radio',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.search),
-                  label: 'Search',
-                ),
-              ],
-              //currentIndex: _selectedIndex,
-              backgroundColor: Colors.grey.shade900,
-              selectedItemColor: Colors.pink,
-              onTap: (index) {
-                _onItemTap(index);
-              },
+        backgroundColor: Colors.black12,
+        bottomNavigationBar: ClipRect(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: 100.0,
+              sigmaY: 100.0,
+            ),
+            child: Opacity(
+              opacity: 0.6,
+              child: BottomNavigationBar(
+                backgroundColor: Colors.black,
+                currentIndex: _currentIndex,
+                items: const <BottomNavigationBarItem>[
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.library_music),
+                    label: 'Library',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.graphic_eq),
+                    label: 'Radio',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Icon(Icons.search),
+                    label: 'Search',
+                  ),
+                ],
+                selectedItemColor: Colors.pink,
+                unselectedItemColor: Colors.grey,
+                onTap: (index) {
+                  _onItemTap(index);
+                },
+              ),
             ),
           ),
         ),
-      ),
-      body: screens[_currentIndex],
-    );
+        body: IndexedStack(
+          children: [
+            const LibraryScreen(),
+            const RadioScreen(),
+            const SearchScreen(),
+          ],
+          index: _currentIndex,
+        ));
   }
 }
