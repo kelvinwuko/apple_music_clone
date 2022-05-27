@@ -1,3 +1,4 @@
+import 'package:apple_music_clone/models/search_album_result.dart';
 import 'package:apple_music_clone/models/search_result.dart';
 import 'package:dio/dio.dart';
 import 'dart:convert';
@@ -8,7 +9,6 @@ class ApiService {
   Future<List<SearchResult>> getSearchResult(String phrasedString) async {
     String url =
         'https://itunes.apple.com/search?term=$phrasedString&limit=50&entity=song&attribute=artistTerm';
-
     final response = await dio.get(url);
     if (response.statusCode == 200) {
       Map<String, dynamic> responseData = jsonDecode(response.data);
@@ -16,6 +16,21 @@ class ApiService {
       return list.map((result) => SearchResult.fromJson(result)).toList();
     } else {
       throw Exception("Failed to get songs");
+    }
+  }
+
+  Future<List<SearchAlbumResult>> getSearchAlbumResult(
+      String phrasedString) async {
+    String url =
+        'https://itunes.apple.com/search?term=$phrasedString&limit=50&entity=album';
+
+    final response = await dio.get(url);
+    if (response.statusCode == 200) {
+      Map<String, dynamic> responseData = jsonDecode(response.data);
+      Iterable list = responseData['results'];
+      return list.map((result) => SearchAlbumResult.fromJson(result)).toList();
+    } else {
+      throw Exception("Failed to get albums");
     }
   }
 }
