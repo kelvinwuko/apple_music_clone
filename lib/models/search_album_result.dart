@@ -4,7 +4,6 @@ class SearchAlbumResult {
     required this.artistId,
     required this.artistName,
     required this.collectionName,
-    required this.artistViewUrl,
     required this.collectionViewUrl,
     required this.artworkUrl100,
     required this.trackCount,
@@ -15,7 +14,6 @@ class SearchAlbumResult {
   int artistId;
   String artistName;
   String collectionName;
-  String artistViewUrl;
   String collectionViewUrl;
   String artworkUrl100;
   int trackCount;
@@ -27,7 +25,6 @@ class SearchAlbumResult {
         artistId: json["artistId"],
         artistName: json["artistName"],
         collectionName: json["collectionName"],
-        artistViewUrl: json["artistViewUrl"],
         collectionViewUrl: json["collectionViewUrl"],
         artworkUrl100: json["artworkUrl100"],
         trackCount: json["trackCount"],
